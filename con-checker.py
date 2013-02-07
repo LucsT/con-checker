@@ -2,6 +2,16 @@ import os
 import datetime
 
 
+IPONLINE1="8.8.8.8"
+IPONLINE2="X"
+IPROUTER="192.168.0.1"
+
+
+def check_ip1:
+    return os.system("ping -c 1 %s >> /dev/null", % IPONLINE1)
+
+def check_ip2:
+    return os.system("ping -c 1 %s >> /dev/null", % IPONLINE2)
 
 try:
     file = open("status.log","a")
@@ -14,18 +24,18 @@ file.close()
 
 while(1):
     #Si on perds google
-    if os.system("ping -c 1 8.8.8.8 >> /dev/null"):
+    if check_ip1():
         #Ouverture du fichier log
         file = open("status.log","a")
         down = datetime.datetime.now()
         #On verifie si uniquement google est down
-        if not os.system("ping -c 1 9.9.9.9 >> /dev/null"):
+        if not os.system("ping -c 1 %s >> /dev/null", % IPONLINE2):
             print("GOOGLE seems down!!")
             file.write("%s GOOGLE seems down!!\n" % down.strftime("%Y-%m-%d %H:%M:%S"))
         #Temporisation
         os.system("sleep 1")
         # Si google out et box OK
-        if os.system("ping -c 1 8.8.8.8 >> /dev/null") and not os.system("ping -c 1 192.168.0.1 >> /dev/null"):
+        if os.system("ping -c 1 %s >> /dev/null", % IPONLINE1) and not os.system("ping -c 1 %s >> /dev/null", % IPROUTER):
             print("DOWN at %s" % down.strftime("%Y-%m-%d %H:%M:%S"))
             file.write("%s DOWN\n" % down.strftime("%Y-%m-%d %H:%M:%S"))
             #Attendre le retour de google
