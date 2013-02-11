@@ -7,16 +7,16 @@ IPONLINE2="89.2.0.1"
 IPROUTER="192.168.0.1"
 LOG_FILE="statut.log"
 # Delay between ping in seconds
-DELAY="5"
+DELAY="2"
 
-def check_ip1():
-    return os.system("ping -c 1 %s >> /dev/null" % IPONLINE1)
+def check_ip1(number=1):
+    return os.system("ping -c %s %s >> /dev/null" %(number, IPONLINE1))
 
-def check_ip2():
-    return os.system("ping -c 1 %s >> /dev/null" % IPONLINE2)
+def check_ip2(number=1):
+    return os.system("ping -c %s %s >> /dev/null" %(number, IPONLINE2))
 
-def check_router():
-    return os.system("ping -c 1 %s >> /dev/null" % IPROUTER)
+def check_router(number=1):
+    return os.system("ping -c %s %s >> /dev/null" %(number, IPROUTER))
 
 def log(string):
       print(string)
@@ -27,9 +27,9 @@ def log(string):
       file.write(string)
       file.close()
 
-def wait_ip1_online():
-    while check_ip1:
-        os.system("sleep %s" % DELAY)
+def wait_ip1_online(delay=1):
+    while check_ip1():
+        os.system("sleep %s" % delay)
     
 
 #Start message with a blank line
@@ -40,31 +40,33 @@ log(" \nStart at : %s\n" % now.strftime("%Y-%m-%d %H:%M:%S"))
 while(1):
     if check_ip1():
         down = datetime.datetime.now()
-        #If ip1 is out, check ip2
-        if not check_ip2():
-            log("%s GOOGLE seems down!!\n" % down.strftime("%Y-%m-%d %H:"\
-                                                               + "%M:%S"))
         #Temporisation
         os.system("sleep 1")
-        #If you're still reach your router, connection problem
-        if check_ip1() and not check_router():
-            log("%s DOWN\n" % down.strftime("%Y-%m-%d %H:%M:%S"))
-            wait_ip1_online()
-            up = datetime.datetime.now()
-            delay = (up - down)
-            log("%s UP after %s \n" %(up.strftime("%Y-%m-%d %H:%M:%S"),
-                                      delay.strftime("%H:%M:%S")))
-        #If you can't contact your router, it's your network problem
-        elif check_ip1() and check_router():
-            log("%s UNREACHABLE\n" % down.strftime("%Y-%m-%d %H:%M:%S"))
-            wait_ip1_online()
-            up = datetime.datetime.now()
-            delay = (up - down)
-            log("%s UP after %s \n" %(up.strftime("%Y-%m-%d %H:%M:%S"),
-                                      delay.strftime("%H:%M:%S")))
+        if check_ip1():
+            #If ip1 is out, check ip2
+            if not check_ip2():
+                log("%s GOOGLE seems down!!\n" % down.strftime("%Y-%m-%d %H:"\
+                                                               + "%M:%S"))
+
+            if check_router():
+            #If you can't contact your router, it's your network problem
+                log("%s UNREACHABLE\n" % down.strftime("%Y-%m-%d %H:%M:%S"))
+                wait_ip1_online()
+                up = datetime.datetime.now()
+                delay = (up - down)
+                log("%s UP after %s Seconds\n" %(up.strftime("%Y-%m-%d %H:"\
+						 + "%M:%S"), delay.seconds))
+            else:
+            #If you're still reach your router, connection problem
+                log("%s DOWN\n" % down.strftime("%Y-%m-%d %H:%M:%S"))
+                wait_ip1_online()
+                up = datetime.datetime.now()
+                delay = (up - down)
+                log("%s UP after %s Seconds\n" %(up.strftime("%Y-%m-%d %H:"\
+	                                         + "%M:%S"), delay.seconds))
         #else it's just a lost packet
         else:
-            log("%s 1 packet loss\n" % now.strftime("%Y-%m-%d %H:%M:%S"))    
+            log("%s 1 packet loss\n" % down.strftime("%Y-%m-%d %H:%M:%S"))    
     
     big_delay -= 1
     if big_delay < 0:
@@ -72,5 +74,5 @@ while(1):
         now = datetime.datetime.now()
         log("%s UP \n" % now.strftime("%Y-%m-%d %H:%M:%S"))
     #Wait the delay and go on!
-    os.system("sleep 5")
+    os.system("sleep %s" % DELAY)
 
