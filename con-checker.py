@@ -54,7 +54,7 @@ while(1):
             if not ip2_state:
                 log("%s GOOGLE seems down and OpenDNS not\n" % down.strftime("%Y-%m-%d %H:"\
                                                                + "%M:%S"))
-		log("%s GOOGLE seems down and OpenDNS not\n" % down2.strftime("%Y-%m-%d %H:"\
+		log("%s GOOGLE seems down and Second Test server not\n" % down2.strftime("%Y-%m-%d %H:"\
                                                                + "%M:%S"))
 
             elif routeur_state:
