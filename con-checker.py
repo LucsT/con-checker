@@ -4,7 +4,7 @@ import datetime
 #Google DNS
 IPONLINE1="8.8.8.8"
 #Open DNS
-IPONLINE2="37.59.47.6"
+IPONLINE2="208.67.222.222"
 #Your router
 IPROUTER="192.168.0.1"
 #Name of logging file
