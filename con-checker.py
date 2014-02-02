@@ -2,6 +2,7 @@ import os
 import datetime
 import sys
 import signal
+import time
 
 #Google DNS Ip
 IPONLINE1="8.8.8.8"
@@ -12,9 +13,10 @@ IPROUTER="192.168.0.1"
 #Name of logging file
 LOG_FILE="statut.log"
 #Delay between 2 ping to IP1 in seconds
-DELAY="2"
+DELAY=2
 #Default Ping time_out
 TIMEOUT=2
+
 
 def check_ip(ip, number=1, time_out=TIMEOUT):
     '''
@@ -31,6 +33,7 @@ def log(string):
     try:
         file = open(LOG_FILE,"a")
     except:
+        #Create if not exist
         file = open(LOG_FILE,"w")
     file.write(string)
     file.close()
@@ -40,12 +43,10 @@ def wait_back_online(delay=1):
     Wait until one IP is up
     '''
     while check_ip(IPONLINE1) and check_ip(IPONLINE2):
-        os.system("sleep %s" % delay)
-    
+        time.sleep(delay)
 
 
 def main():
-    #Start message with a blank line
     printup_delay = 0
     now = datetime.datetime.now()
     log("Start at : %s\n" % now.strftime("%Y-%m-%d %H:%M:%S"))
@@ -56,9 +57,7 @@ def main():
         down = datetime.datetime.now()
         #IP1 is Down and IP2 is Down
         if ip1_state and ip2_state:
-	    #ip2_state = check_ip(IPONLINE2)
             router_state = check_ip(IPROUTER)
-
             #If you can't contact your router, it's your network problem
             if router_state:
                 log("%s UNREACHABLE Router/Box\n" 
@@ -96,11 +95,14 @@ def main():
             if printup_delay < 0:
                 printup_delay = 600
                 down = datetime.datetime.now()
-                log("%s UP \n" % now.strftime("%Y-%m-%d %H:%M:%S"))
+                log("%s UP \n" % down.strftime("%Y-%m-%d %H:%M:%S"))
             #Wait the delay and go on another time!
-            os.system("sleep %s" % DELAY)
-
+            time.sleep(DELAY)
  
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print 'Exiting'
+        sys.exit(1)
         
