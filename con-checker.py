@@ -1,16 +1,21 @@
 import os
 import datetime
 
-#Google DNS
+#Google DNS Ip
 IPONLINE1="8.8.8.8"
-#Open DNS
+#Open DNS Ip
 IPONLINE2="208.67.222.222"
-#Your router
+#Your router Ip
 IPROUTER="192.168.0.1"
 #Name of logging file
 LOG_FILE="statut.log"
-# Delay between ping in seconds
+#Delay between 2 ping to IP1 in seconds
 DELAY="2"
+#Default Ping time_out
+TIMEOUT=2
+
+def check_ip(ip, number=1, time_out=TIMEOUT):
+    return os.system("ping -c %s -W %s %s >> /dev/null" %(number, time_out, ip))
 
 def check_ip1(number=1, time_out=2):
     return os.system("ping -c %s -W %s %s >> /dev/null" %(number, time_out, IPONLINE1))
@@ -23,33 +28,36 @@ def check_router(number=1, time_out=2):
 
 
 def log(string):
-      print(string)
-      try:
-          file = open(LOG_FILE,"a")
-      except:
-          file = open(LOG_FILE,"w")
-      file.write(string)
-      file.close()
+    '''
+    Log in file and print on console
+    '''
+    print(string)
+    try:
+        file = open(LOG_FILE,"a")
+    except:
+        file = open(LOG_FILE,"w")
+    file.write(string)
+    file.close()
 
 def wait_ip1_online(delay=1):
-    while check_ip1():
+    while check_ip(IPONLINE1):
         os.system("sleep %s" % delay)
     
 
 #Start message with a blank line
-big_delay = 0
+printup_delay = 0
 now = datetime.datetime.now()
 log(" \nStart at : %s\n" % now.strftime("%Y-%m-%d %H:%M:%S"))
 
 while(1):
-    if check_ip1():
+    if check_ip(IPONLINE1):
         down = datetime.datetime.now()
-	ip2_state = check_ip2()
-	routeur_state = check_router()
+	ip2_state = check_ip(IPONLINE2)
+	routeur_state = check_ip(IPROUTER)
 	#Temporisation
-        os.system("sleep 1")
+        #os.system("sleep 1")
 	down2 = datetime.datetime.now()
-        if check_ip1():
+        if check_ip(IPONLINE1):
             #If ip1 is out, check ip2
             if not ip2_state:
                 log("%s GOOGLE seems down and OpenDNS not\n" % down.strftime("%Y-%m-%d %H:"\
@@ -76,12 +84,13 @@ while(1):
         #else it's just a lost packet
         else:
             log("%s Packets loss\n" % down.strftime("%Y-%m-%d %H:%M:%S"))    
-    
-    big_delay -= 1
-    if big_delay < 0:
-        big_delay = 600
+
+    #If I can contact IP1
+    printup_delay -= 1
+    if printup_delay < 0:
+        printup_delay = 600
         now = datetime.datetime.now()
         log("%s UP \n" % now.strftime("%Y-%m-%d %H:%M:%S"))
-    #Wait the delay and go on!
+    #Wait the delay and go on another time!
     os.system("sleep %s" % DELAY)
 
