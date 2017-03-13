@@ -1,24 +1,13 @@
+#!/usr/bin/python
+
 import os
 import datetime
 import sys
 import signal
 import time
+from config import *
 
-#Google DNS Ip
-IPONLINE1="8.8.8.8"
-#Open DNS Ip
-IPONLINE2="208.67.222.222"
-#Your router Ip
-IPROUTER="192.168.0.1"
-#Name of logging file
-LOG_FILE="statut.log"
-#Delay between 2 ping to IP1 in seconds
-DELAY=2
-#Default Ping time_out
-TIMEOUT=2
-
-
-def check_ip(ip, number=1, time_out=TIMEOUT):
+def check_ip(ip, number=1, time_out=PING_TIMEOUT):
     '''
     Return nothing if 'Number' ping with 'Timeout' is OK
     '''
@@ -98,11 +87,11 @@ def main():
                 log("%s UP \n" % down.strftime("%Y-%m-%d %H:%M:%S"))
             #Wait the delay and go on another time!
             time.sleep(DELAY)
- 
+        
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print 'Exiting'
+        print 'Interrupted by user, exiting'
         sys.exit(1)
         
