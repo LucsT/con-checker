@@ -1,0 +1,13 @@
+[Unit]
+Description=con-checker - Connection Monitoring
+After=multi-user.target
+
+[Service]
+User=root
+Group=root
+StandardOutput=syslog
+StandardError=syslog
+ExecStart=/usr/bin/python /root/con-checker/con-checker.py
+Restart=always
+
+
