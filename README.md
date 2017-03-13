@@ -1,6 +1,6 @@
 # Con-checker
 
-Tools to check your internet connection 24/7 and log results
+Tool to check your internet connection 24/7 and log results
 
 ### Prerequisites
 
